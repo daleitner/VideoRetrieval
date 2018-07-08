@@ -66,7 +66,7 @@ public class DBClient {
         } else {
             query = "{ $or: [ ";
             for (int i = 0; i < labels.length; i++) {
-                query += "{ labels: \"" + labels[i] + "\"" + (i == labels.length - 1 ? " } " : " }, ");
+                query += "{ labels: { $regex: /.*" + labels[i] + ".*/i } " + (i == labels.length - 1 ? " } " : " }, ");
             }
             query += " ] }";
         }
