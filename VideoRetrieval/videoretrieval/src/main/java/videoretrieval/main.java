@@ -26,7 +26,7 @@ public class main {
 
     private static DBClient dbClient;
     private static ImageClassifier classifier;
-    private static boolean shouldSubmitResults = false;
+    private static boolean shouldSubmitResults = true;
 
     // Wolfram's setup
     private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos/";
@@ -229,13 +229,19 @@ public class main {
 
     private static void submitResults(RankedFrameDescriptor[] results, int numResults) {
         int i = 0;
-        boolean success = false;
+        String success = "wv";
         numResults = Math.min(numResults, results.length);
 
         System.out.println("Submitting results... ");
-        while(!success && i < numResults) {
+        while(!success.equals("sc") && i < numResults) {
             try {
                 success = submitResult(String.valueOf(results[i].fileId), String.valueOf(results[i].frameNumber));
+
+                if (success.equals("wv")) {
+                    // TODO: remove this video id
+                } else if (success.equals("wf")) {
+                    // TODO: remove all other video ids
+                }
             } catch (Exception e) {
                 System.out.println("Exception on submitResult: " + e.getMessage());
             }
@@ -360,7 +366,7 @@ public class main {
 		return videoFileNames;
 	}
 
-    private static boolean submitResult(String videoId, String frameNum) throws Exception {
+    private static String submitResult(String videoId, String frameNum) throws Exception {
         String url = "http://demo2.itec.aau.at:80/vbs/aau/submit?team=%s&video=%s&frame=%s";
         url = String.format(url, "1", videoId, frameNum);
 
@@ -383,6 +389,12 @@ public class main {
         String responseString = response.toString();
         System.out.println("\tResponse: " + responseString);
 
-        return !responseString.contains("Wrong");
+        if (responseString.contains("Wrong video")) {
+            return "wv";
+        } else if (responseString.contains("Wrong")) {
+            return "wf";
+        } else {
+            return "sc";
+        }
     }
 }
