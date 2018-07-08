@@ -44,9 +44,9 @@ public class VideoAnalyzer {
      */
     public ArrayList<Frame> extractKeyFrames(String videoPath, int videoId, int fps, double th) {
         VideoCapture video = new VideoCapture(videoPath);
+        int totalFrames = (int) video.get(Videoio.CAP_PROP_FRAME_COUNT);
 
-        System.out.println("FPS: " + video.get(Videoio.CAP_PROP_FPS));
-        System.out.println("Frames: " + video.get(Videoio.CAP_PROP_FRAME_COUNT));
+        System.out.println("\tfps: " + video.get(Videoio.CAP_PROP_FPS) + ", total_frames: " + totalFrames);
 
         Mat frame = new Mat();
         ArrayList<Frame> frames = new ArrayList<>();
@@ -59,7 +59,7 @@ public class VideoAnalyzer {
             samplingDistance = (int) Math.round(video.get(Videoio.CAP_PROP_FPS)) / fps;
         }
 
-        System.out.println("Using frame sampling interval: " + samplingDistance);
+        System.out.println("\tUsing frame sampling interval: " + samplingDistance);
 
         boolean isFirstFrame = true;
         int frameCount = 0;
@@ -67,6 +67,8 @@ public class VideoAnalyzer {
         while (video.read(frame)) {
             if (frame.empty()) { continue; }
             frameCount++;
+
+            System.out.print("\r\tProcessing frame " + (frameCount - 1) + " of " + totalFrames);
 
             if ((frameCount % samplingDistance == 1) || samplingDistance == 1) {
                 if (isFirstFrame) {
@@ -79,7 +81,7 @@ public class VideoAnalyzer {
                     double distance = (1 - Imgproc.compareHist(previousFrameHist, nextFrameHist, Imgproc.CV_COMP_CORREL));
 
                     if(distance > th) {
-                        System.out.println("distance (" + frames.size() + "," + (frames.size() + 1) + "): " + distance);
+                        //System.out.println("\tdistance (" + frames.size() + "," + (frames.size() + 1) + "): " + distance);
 
                         FrameDescriptor descriptor = FrameDescriptor.create(videoId, frameCount - 1, null, null, null);
                         frames.add(new Frame(videoId, frameCount - 1, frame.clone(), nextFrameHist));
@@ -90,6 +92,7 @@ public class VideoAnalyzer {
                 }
             }
         }
+        System.out.print(". Done! Found " + frames.size() + " shots.\r\n");
         return frames;
     }
 }
