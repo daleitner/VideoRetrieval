@@ -82,7 +82,7 @@ public class main {
 
 	private static void runClassification() {
 		VideoAnalyzer va = new VideoAnalyzer();
-		ArrayList<Mat> frames = va.extractKeyFrames(testvideo, 1, 0.4);
+		ArrayList<Mat> frames = va.extractKeyFrames(testvideo, 1, 0.6);
 
 		String imgPath = path + "/Imgs/";
 		for(int i = 0; i<frames.size(); i++) {

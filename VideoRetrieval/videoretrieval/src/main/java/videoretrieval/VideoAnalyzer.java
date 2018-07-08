@@ -3,7 +3,6 @@ package videoretrieval;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -76,9 +75,10 @@ public class VideoAnalyzer {
                     previousFrameHist = this.calcHist(frame);
                 } else {
                     nextFrameHist = this.calcHist(frame);
-                    double distance = Imgproc.compareHist(previousFrameHist, nextFrameHist, Imgproc.CV_COMP_CORREL);
+                    // Imgproc.compareHist with Imgproc.CV_COMP_CORREL returns similarity measure
+                    double distance = (1 - Imgproc.compareHist(previousFrameHist, nextFrameHist, Imgproc.CV_COMP_CORREL));
 
-                    if (distance < th) {
+                    if(distance > th) {
                         System.out.println("distance (" + frames.size() + "," + (frames.size() + 1) + "): " + distance);
                         frames.add(frame.clone());
 
