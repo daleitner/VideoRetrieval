@@ -2,6 +2,7 @@ package videoretrieval;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Core;
@@ -28,10 +29,7 @@ public class VideoAnalyzer {
 
         Mat hsvframe = new Mat();
         Imgproc.cvtColor(frame, hsvframe, Imgproc.COLOR_BGR2HSV);
-        List<Mat> imageList = new ArrayList<Mat>();
-        imageList = new ArrayList<Mat>();
-        imageList.add(hsvframe);
-        Imgproc.calcHist(imageList, new MatOfInt(0, 1), new Mat(), hsvHist, histSize, histRange);
+        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, histSize, histRange);
 
         return hsvHist;
     }
