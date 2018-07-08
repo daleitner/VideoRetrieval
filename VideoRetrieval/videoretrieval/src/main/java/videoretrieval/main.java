@@ -246,7 +246,6 @@ public class main {
 	}
 
 	private static void classify(String videoFileName) {
-        System.out.println("########################################");
         System.out.println("Classifying " + videoFileName);
         int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
 
@@ -274,7 +273,7 @@ public class main {
         }
 
         String[] labels = labelsList.toArray(new String[0]);
-        System.out.println("Labels: " + Arrays.toString(labels));
+        System.out.println("\tLabels: " + Arrays.toString(labels));
 
         // Convert histogram Mat into double array
         // Some "workaround" taken from
