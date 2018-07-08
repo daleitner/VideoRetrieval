@@ -220,7 +220,6 @@ public class main {
                 System.out.println("r: " + colours[j].red + ", g: " + colours[j].green + ", blue: " + colours[j].blue);
             }
 
-			// TODO get dominant colors
 			// TODO save to DB
 			FrameDescriptor.create(f.fileId, f.number, hist, null, labels);
 		}
