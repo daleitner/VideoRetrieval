@@ -82,7 +82,7 @@ public class DBClient {
 
             query = "{ $or: [ ";
             for (int i = 0; i < partialLabels.length; i++) {
-                query += "{ labels: { $regex: /.*" + partialLabels[i] + ".*/i } " + (i == partialLabels.length - 1 ? " } " : " }, ");
+                query += "{ labels: { $regex: \".*" + partialLabels[i] + ".*\", $options: \"i\" } " + (i == partialLabels.length - 1 ? " } " : " }, ");
             }
             query += " ] }";
         }
