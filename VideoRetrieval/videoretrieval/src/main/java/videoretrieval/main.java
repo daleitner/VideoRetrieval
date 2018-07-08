@@ -29,7 +29,7 @@ public class main {
     private static ImageClassifier classifier;
 
     // Wolfram's setup
-    private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos";
+    private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos/";
 
     // Jameson's setup
     // private static final String basePath = "C:/Users/Admin/vids/";
@@ -195,6 +195,7 @@ public class main {
 
 		// TODO loop over all videos, now using LEGO video only for testing
 		String videoFileName = videoFileNames.get(23);
+		videoFileName = "35368.mp4";
 		int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
 
 		VideoAnalyzer va = new VideoAnalyzer();
@@ -215,20 +216,7 @@ public class main {
                 hist[i] = (hist[i] / 2);
             }
 
-            Colour[] colours = getDominantColours(f.data, 5);
-            for (int j = 0; j < colours.length; j++) {
-                System.out.println("r: " + colours[j].red + ", g: " + colours[j].green + ", blue: " + colours[j].blue);
-            }
-
-			// TODO save to DB
-			FrameDescriptor.create(f.fileId, f.number, hist, null, labels);
-		}
-
-		// Save frames
-		String imgPath = basePath + "img" + videoFileName.replaceAll(".mp4","") + "/" ;
-		for(int i = 0; i < frames.size(); i++) {
-			Mat frame = frames.get(i).data;
-			Imgcodecs.imwrite(imgPath + (i+1) + ".jpg", frame);
+            dbClient.saveFrameDescriptor(FrameDescriptor.create(f.fileId, f.number, hist, getDominantColours(f.data, 5), labels));
 		}
 	}
 

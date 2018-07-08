@@ -62,6 +62,9 @@ public class DBClient {
         }
 
         query += " ] } }";
+
+        System.out.println("executing " + query);
+
         MongoCursor<FrameDescriptor> matches = this.frameDescriptors.find(query).as(FrameDescriptor.class);
         ArrayList<FrameDescriptor> matchesList = new ArrayList<>(matches.count());
 
