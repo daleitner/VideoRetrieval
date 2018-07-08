@@ -26,6 +26,7 @@ public class main {
 
     private static DBClient dbClient;
     private static ImageClassifier classifier;
+    private static boolean shouldSubmitResults = false;
 
     // Wolfram's setup
     private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos/";
@@ -180,7 +181,10 @@ public class main {
         );
 
         System.out.println(matches.length);
-        System.out.println("not implemented");
+
+        if (shouldSubmitResults) {
+            submitResults(matches);
+        }
     }
 
     private static void executeQuery(Mat image, boolean strict) {
@@ -193,7 +197,10 @@ public class main {
         );
 
         System.out.println(matches.length);
-        System.out.println("not implemented");
+
+        if (shouldSubmitResults) {
+            submitResults(matches);
+        }
     }
 
     private static RankedFrameDescriptor[] rankResults(FrameDescriptor[] results, String[] targetLabels, double[] histogram, Colour[] dominantColours) {
@@ -209,6 +216,28 @@ public class main {
         Arrays.sort(rankedFrameDescriptors, (a, b) -> (int) Math.signum(b.score - a.score));
 
         return rankedFrameDescriptors;
+    }
+
+    private static void submitResults(RankedFrameDescriptor[] results) {
+        submitResults(results, results.length);
+    }
+
+    private static void submitResults(RankedFrameDescriptor[] results, int numResults) {
+        int i = 0;
+        boolean success = false;
+        numResults = Math.min(numResults, results.length);
+
+        System.out.println("Submitting results... ");
+        while(!success && i < numResults) {
+            try {
+                success = submitResult(String.valueOf(results[i].fileId), String.valueOf(results[i].frameNumber));
+            } catch (Exception e) {
+                System.out.println("Exception on submitResult: " + e.getMessage());
+            }
+            i++;
+        }
+
+        System.out.println("Hit? " + success);
     }
 
     private static Colour[] getDominantColours(Mat image, int k) {
@@ -301,7 +330,7 @@ public class main {
 		return videoFileNames;
 	}
 
-    private static void submitResult(String videoId, String frameNum) throws Exception {
+    private static boolean submitResult(String videoId, String frameNum) throws Exception {
         String url = "http://demo2.itec.aau.at:80/vbs/aau/submit?team=%s&video=%s&frame=%s";
         url = String.format(url, "1", videoId, frameNum);
 
@@ -321,6 +350,9 @@ public class main {
         }
         in.close();
 
-        System.out.println("\tResponse: " + response.toString());
+        String responseString = response.toString();
+        System.out.println("\tResponse: " + responseString);
+
+        return !responseString.contains("Wrong");
     }
 }
