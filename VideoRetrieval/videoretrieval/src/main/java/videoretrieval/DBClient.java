@@ -54,14 +54,22 @@ public class DBClient {
         return descriptorList.toArray(new FrameDescriptor[0]);
     }
 
-    public FrameDescriptor[] query(String[] labels, Boolean matchAll) {
-        String query = "{ labels : { " + (matchAll ? "$all" : "$in") + " : [ ";
+    public FrameDescriptor[] query(String[] labels, Boolean strict) {
+        String query;
 
-        for (int i = 0; i < labels.length; i++) {
-            query += "'" + labels[i] + "'" + (i == labels.length - 1 ? " " : ", ");
+        if (strict) {
+            query = "{ labels : { $all: [ ";
+            for (int i = 0; i < labels.length; i++) {
+                query += "'" + labels[i] + "'" + (i == labels.length - 1 ? " " : ", ");
+            }
+            query += " ] } }";
+        } else {
+            query = "{ $or: [ ";
+            for (int i = 0; i < labels.length; i++) {
+                query += "{ labels: '" + labels[i] + "'" + (i == labels.length - 1 ? " } " : " }, ");
+            }
+            query += " ] }";
         }
-
-        query += " ] } }";
 
         System.out.println("executing " + query);
 

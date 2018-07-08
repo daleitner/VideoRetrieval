@@ -44,9 +44,13 @@ public class main {
         System.out.println("What do you want to do?");
         System.out.println("  [0] Run classification on database");
         System.out.println("  [1] Execute query based on labels");
-        System.out.println("  [2] Execute query based on labels and dominant colors");
-        System.out.println("  [3] Execute query based on query image");
-        System.out.println("  [4] Execute query based on query image URL");
+        System.out.println("  [2] Execute query based on labels (strict)");
+        System.out.println("  [3] Execute query based on labels and dominant colors");
+        System.out.println("  [4] Execute query based on labels (strict) and dominant colors");
+        System.out.println("  [5] Execute query based on query image");
+        System.out.println("  [6] Execute query based on query image (strict)");
+        System.out.println("  [7] Execute query based on query image URL");
+        System.out.println("  [8] Execute query based on query image URL (strict)");
         System.out.println("  [C] Clear the image descriptor database");
         System.out.println("  [q] quit");
         readMenuInput();
@@ -67,19 +71,35 @@ public class main {
                 break;
 
             case '1':
-                executeQuery(readLabels(), new Colour[0]);
+                executeQuery(readLabels(), new Colour[0], false);
                 break;
 
             case '2':
-                executeQuery(readLabels(), readColours());
+                executeQuery(readLabels(), new Colour[0], true);
                 break;
 
             case '3':
-                executeQuery(getImageFromFile(readString("filename")));
+                executeQuery(readLabels(), readColours(), false);
                 break;
 
             case '4':
-                executeQuery(getImageFromURL(readString("URL")));
+                executeQuery(readLabels(), readColours(), true);
+                break;
+
+            case '5':
+                executeQuery(getImageFromFile(readString("filename")), false);
+                break;
+
+            case '6':
+                executeQuery(getImageFromFile(readString("filename")), true);
+                break;
+
+            case '7':
+                executeQuery(getImageFromURL(readString("URL")), false);
+                break;
+
+            case '8':
+                executeQuery(getImageFromURL(readString("URL")), true);
                 break;
 
             case 'C':
@@ -152,17 +172,17 @@ public class main {
         return colours.toArray(new Colour[0]);
     }
 
-    private static void executeQuery(String[] labels, Colour[] dominantColours) {
-        FrameDescriptor[] matches = dbClient.query(labels, false);
+    private static void executeQuery(String[] labels, Colour[] dominantColours, boolean strict) {
+        FrameDescriptor[] matches = dbClient.query(labels, strict);
 
         System.out.println(matches.length);
         System.out.println("not implemented");
     }
 
-    private static void executeQuery(Mat image) {
+    private static void executeQuery(Mat image, boolean strict) {
         // TODO: get labels
         String[] labels = new String[0];
-        FrameDescriptor[] matches = dbClient.query(labels, false);
+        FrameDescriptor[] matches = dbClient.query(labels, strict);
 
         System.out.println(matches.length);
         System.out.println("not implemented");
@@ -202,7 +222,20 @@ public class main {
 		ArrayList<Frame> frames = va.extractKeyFrames(basePath + videoFileName, fileId, 1, 0.6);
 
 		for (Frame f: frames) {
-			String[] labels = classifier.getLabels(classifier.classify(f.data, 5));
+			String[] rawLabels = classifier.getLabels(classifier.classify(f.data, 5));
+			ArrayList<String> labelsList = new ArrayList<>();
+
+			for (String label: rawLabels) {
+			    if (label.indexOf(',') > -1) {
+			        for (String subLabel: label.split(",")) {
+			            labelsList.add(subLabel.trim());
+                    }
+                } else {
+			        labelsList.add(label);
+                }
+            }
+
+			String[] labels = labelsList.toArray(new String[0]);
 			System.out.println("Labels: " + Arrays.toString(labels));
 
 			// Convert histogram Mat into double array
