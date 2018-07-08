@@ -35,7 +35,7 @@ public class Util {
         return hist;
     }
 
-    private static double[] renormHist(double[] unnormHistArr) {
+    public static double[] normalizeHistogram(double[] unnormHistArr) {
         Mat hist = Util.arr2Mat(unnormHistArr);
         Core.normalize(hist, hist, 0, 1 , Core.NORM_MINMAX);
         return Util.mat2Arr(hist);

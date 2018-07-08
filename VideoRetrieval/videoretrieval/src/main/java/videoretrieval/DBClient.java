@@ -105,8 +105,7 @@ public class DBClient {
         FrameDescriptor[] descriptors = this.getAllDescriptors();
 
         for (FrameDescriptor descriptor: descriptors) {
-            // TODO: call normalization function
-            descriptor.histogram = descriptor.histogram;
+            descriptor.histogram = Util.normalizeHistogram(descriptor.histogram);
             this.frameDescriptors.update(descriptor._id).with(descriptor);
         }
     }
