@@ -7,9 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import javax.imageio.ImageIO;
@@ -146,6 +144,7 @@ public class main {
     private static void executeQuery(String[] labels, Colour[] dominantColours) {
         FrameDescriptor[] matches = dbClient.query(labels, false);
 
+        System.out.println(matches.length);
         System.out.println("not implemented");
     }
 
@@ -154,6 +153,7 @@ public class main {
         String[] labels = new String[0];
         FrameDescriptor[] matches = dbClient.query(labels, false);
 
+        System.out.println(matches.length);
         System.out.println("not implemented");
     }
 
@@ -165,7 +165,33 @@ public class main {
         for(int i = 0; i<frames.size(); i++) {
             Mat frame = frames.get(i);
             System.out.println("Labels: " + Arrays.toString(classifier.getLabels(classifier.classify(frame, 5))));
+            Colour[] colours = getDominantColours(frame, 5);
+            for (int j = 0; i < colours.length; i++) {
+                System.out.println("r: " + colours[i].red + ", g: " + colours[i].green + ", blue: " + colours[i].blue);
+            }
             Imgcodecs.imwrite(imgPath + (i+1) + ".jpg", frame);
         }
+    }
+
+    private static Colour[] getDominantColours(Mat image, int k) {
+        ArrayList<Colour> dominantColours = new ArrayList<>(k);
+        Mat samples = image.reshape(1, image.cols() * image.rows());
+        Mat samples32f = new Mat();
+        samples.convertTo(samples32f, CvType.CV_32F, 1.0 / 255.0);
+
+        Mat labels = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
+        Mat centers = new Mat();
+        Core.kmeans(samples32f, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centers);
+
+        for (int i = 0; i < k; i++) {
+            int red = (int)Math.round(centers.get(i, 2)[0] * 255);
+            int green = (int)Math.round(centers.get(i, 1)[0] * 255);
+            int blue = (int)Math.round(centers.get(i, 0)[0] * 255);
+
+            dominantColours.add(Colour.create(red, green, blue));
+        }
+
+        return dominantColours.toArray(new Colour[0]);
     }
 }
