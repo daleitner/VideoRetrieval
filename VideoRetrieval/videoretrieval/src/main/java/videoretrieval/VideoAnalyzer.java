@@ -3,7 +3,6 @@ package videoretrieval;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -18,18 +17,19 @@ public class VideoAnalyzer {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
+    private int hbins = 30, sbins = 32;
+    private MatOfInt histSize = new MatOfInt(this.hbins, this.sbins);
+
     public VideoAnalyzer() {
     }
 
     private Mat calcHist(Mat frame) {
         Mat hsvHist = new Mat();
-        int hbins = 30, sbins = 32;
-        MatOfInt histSize = new MatOfInt(hbins, sbins);
         MatOfFloat histRange = new MatOfFloat(0f, 180f, 0f, 256f);
 
         Mat hsvframe = new Mat();
         Imgproc.cvtColor(frame, hsvframe, Imgproc.COLOR_BGR2HSV);
-        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, histSize, histRange);
+        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, this.histSize, histRange);
 
         return hsvHist;
     }
@@ -53,7 +53,14 @@ public class VideoAnalyzer {
         Mat previousFrameHist = new Mat();
         Mat nextFrameHist = new Mat();
 
-        int samplingDistance = (int) Math.round(video.get(Videoio.CAP_PROP_FPS)) / fps;
+        int samplingDistance = 1;
+
+        if (fps > 0) {
+            samplingDistance = (int) Math.round(video.get(Videoio.CAP_PROP_FPS)) / fps;
+        }
+
+        System.out.println("Using frame sampling interval: " + samplingDistance);
+
         boolean isFirstFrame = true;
         int frameCount = 0;
 
@@ -61,16 +68,17 @@ public class VideoAnalyzer {
             if (frame.empty()) { continue; }
             frameCount++;
 
-            if (frameCount % samplingDistance == 1) {
+            if ((frameCount % samplingDistance == 1) || samplingDistance == 1) {
                 if (isFirstFrame) {
                     isFirstFrame = false;
                     frames.add(frame.clone());
                     previousFrameHist = this.calcHist(frame);
                 } else {
                     nextFrameHist = this.calcHist(frame);
-                    double distance = Imgproc.compareHist(previousFrameHist, nextFrameHist, Imgproc.CV_COMP_CORREL);
+                    // Imgproc.compareHist with Imgproc.CV_COMP_CORREL returns similarity measure
+                    double distance = (1 - Imgproc.compareHist(previousFrameHist, nextFrameHist, Imgproc.CV_COMP_CORREL));
 
-                    if (distance < th) {
+                    if(distance > th) {
                         System.out.println("distance (" + frames.size() + "," + (frames.size() + 1) + "): " + distance);
                         frames.add(frame.clone());
 
