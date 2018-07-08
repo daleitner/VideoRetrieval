@@ -5,10 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import org.opencv.core.*;
 import org.opencv.core.Core;
@@ -253,19 +250,19 @@ public class main {
 
 	private static FrameDescriptor getFrameDescriptor(Frame f) {
         String[] rawLabels = classifier.getLabels(classifier.classify(f.data, 5));
-        ArrayList<String> labelsList = new ArrayList<>();
+        Set<String> labelsSet = new HashSet<>();
 
         for (String label: rawLabels) {
             if (label.indexOf(',') > -1) {
                 for (String subLabel: label.split(",")) {
-                    labelsList.add(subLabel.trim());
+                    labelsSet.add(subLabel.trim());
                 }
             } else {
-                labelsList.add(label);
+                labelsSet.add(label);
             }
         }
 
-        String[] labels = labelsList.toArray(new String[0]);
+        String[] labels = labelsSet.toArray(new String[0]);
         System.out.println("Labels: " + Arrays.toString(labels));
 
         // Convert histogram Mat into double array
