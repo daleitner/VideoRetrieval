@@ -17,19 +17,19 @@ public class VideoAnalyzer {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    private int hbins = 30, sbins = 32;
-    private MatOfInt histSize = new MatOfInt(this.hbins, this.sbins);
+    private static int hbins = 30, sbins = 32;
+    private static MatOfInt histSize = new MatOfInt(VideoAnalyzer.hbins, VideoAnalyzer.sbins);
 
     public VideoAnalyzer() {
     }
 
-    private Mat calcHist(Mat frame) {
+    public static Mat calcHist(Mat frame) {
         Mat hsvHist = new Mat();
         MatOfFloat histRange = new MatOfFloat(0f, 180f, 0f, 256f);
 
         Mat hsvframe = new Mat();
         Imgproc.cvtColor(frame, hsvframe, Imgproc.COLOR_BGR2HSV);
-        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, this.histSize, histRange);
+        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, VideoAnalyzer.histSize, histRange);
 
         return hsvHist;
     }
@@ -71,10 +71,10 @@ public class VideoAnalyzer {
             if ((frameCount % samplingDistance == 1) || samplingDistance == 1) {
                 if (isFirstFrame) {
                     isFirstFrame = false;
-                    previousFrameHist = this.calcHist(frame);
+                    previousFrameHist = VideoAnalyzer.calcHist(frame);
                     frames.add(new Frame(videoId, frameCount - 1, frame.clone(), previousFrameHist));
                 } else {
-                    nextFrameHist = this.calcHist(frame);
+                    nextFrameHist = VideoAnalyzer.calcHist(frame);
                     // Imgproc.compareHist with Imgproc.CV_COMP_CORREL returns similarity measure
                     double distance = (1 - Imgproc.compareHist(previousFrameHist, nextFrameHist, Imgproc.CV_COMP_CORREL));
 

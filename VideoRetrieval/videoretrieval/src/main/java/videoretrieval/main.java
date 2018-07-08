@@ -180,9 +180,8 @@ public class main {
     }
 
     private static void executeQuery(Mat image, boolean strict) {
-        // TODO: get labels
-        String[] labels = new String[0];
-        FrameDescriptor[] matches = dbClient.query(labels, strict);
+        FrameDescriptor queryFrame = getFrameDescriptor(new Frame(0, 0, image, VideoAnalyzer.calcHist(image)));
+        FrameDescriptor[] matches = dbClient.query(queryFrame.labels, strict);
 
         System.out.println(matches.length);
         System.out.println("not implemented");
@@ -219,39 +218,43 @@ public class main {
 		int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
 
 		VideoAnalyzer va = new VideoAnalyzer();
-		ArrayList<Frame> frames = va.extractKeyFrames(basePath + videoFileName, fileId, 1, 0.6);
+        ArrayList<Frame> frames = va.extractKeyFrames(basePath + videoFileName, fileId, 1, 0.6);
 
 		for (Frame f: frames) {
-			String[] rawLabels = classifier.getLabels(classifier.classify(f.data, 5));
-			ArrayList<String> labelsList = new ArrayList<>();
-
-			for (String label: rawLabels) {
-			    if (label.indexOf(',') > -1) {
-			        for (String subLabel: label.split(",")) {
-			            labelsList.add(subLabel.trim());
-                    }
-                } else {
-			        labelsList.add(label);
-                }
-            }
-
-			String[] labels = labelsList.toArray(new String[0]);
-			System.out.println("Labels: " + Arrays.toString(labels));
-
-			// Convert histogram Mat into double array
-			// Some "workaround" taken from
-            // http://answers.opencv.org/question/14961/using-get-and-put-to-access-pixel-values-in-java/
-            f.histogram.convertTo(f.histogram, CvType.CV_64FC3);
-            int histArrSize = (int) (f.histogram.total() * f.histogram.channels());
-            double[] hist = new double[histArrSize];
-            f.histogram.get(0,0, hist);
-            for (int i = 0; i < histArrSize; i++) {
-                hist[i] = (hist[i] / 2);
-            }
-
-            dbClient.saveFrameDescriptor(FrameDescriptor.create(f.fileId, f.number, hist, getDominantColours(f.data, 5), labels));
+            dbClient.saveFrameDescriptor(getFrameDescriptor(f));
 		}
 	}
+
+	private static FrameDescriptor getFrameDescriptor(Frame f) {
+        String[] rawLabels = classifier.getLabels(classifier.classify(f.data, 5));
+        ArrayList<String> labelsList = new ArrayList<>();
+
+        for (String label: rawLabels) {
+            if (label.indexOf(',') > -1) {
+                for (String subLabel: label.split(",")) {
+                    labelsList.add(subLabel.trim());
+                }
+            } else {
+                labelsList.add(label);
+            }
+        }
+
+        String[] labels = labelsList.toArray(new String[0]);
+        System.out.println("Labels: " + Arrays.toString(labels));
+
+        // Convert histogram Mat into double array
+        // Some "workaround" taken from
+        // http://answers.opencv.org/question/14961/using-get-and-put-to-access-pixel-values-in-java/
+        f.histogram.convertTo(f.histogram, CvType.CV_64FC3);
+        int histArrSize = (int) (f.histogram.total() * f.histogram.channels());
+        double[] hist = new double[histArrSize];
+        f.histogram.get(0,0, hist);
+        for (int i = 0; i < histArrSize; i++) {
+            hist[i] = (hist[i] / 2);
+        }
+
+        return FrameDescriptor.create(f.fileId, f.number, hist, getDominantColours(f.data, 5), labels);
+    }
 
 	private static List<String> readFileNames(String directoryPath) {
 		File folder = new File(directoryPath);
