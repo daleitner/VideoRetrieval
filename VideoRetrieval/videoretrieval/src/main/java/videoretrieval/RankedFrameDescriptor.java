@@ -42,11 +42,7 @@ public class RankedFrameDescriptor extends FrameDescriptor {
         double labelScore = numMatches / ((numLabels + numTargetLabels) - numMatches);
 
         if (targetHistogram.length > 0) {
-            histogramScore = 1 / Math.max(norm(
-                    arrayToMat(this.histogram),
-                    arrayToMat(targetHistogram),
-                    NORM_L2
-            ), 1e-5);
+            histogramScore = 1 - (norm(arrayToMat(this.histogram), arrayToMat(targetHistogram), NORM_L2) / Math.sqrt(this.histogram.length));
         }
 
         if (targetDominantColours.length > 0) {
@@ -54,11 +50,11 @@ public class RankedFrameDescriptor extends FrameDescriptor {
                 double maxSimilarity = Double.MIN_VALUE;
 
                 for (Colour dominantColour: this.dominantColours) {
-                    double score = 1 / Math.max(norm(
-                            arrayToMat(new double[] {dominantColour.red, dominantColour.green, dominantColour.blue}),
-                            arrayToMat(new double[] {targetDominantColour.red, targetDominantColour.green, targetDominantColour.blue}),
+                    double score = 1 - (norm(
+                            arrayToMat(new double[] {dominantColour.red / 255, dominantColour.green / 255, dominantColour.blue / 255}),
+                            arrayToMat(new double[] {targetDominantColour.red / 255, targetDominantColour.green / 255, targetDominantColour.blue / 255}),
                             NORM_L2
-                    ), 1e-5);
+                    ) / Math.sqrt(3));
 
                     if (score > maxSimilarity) {
                         maxSimilarity = score;
