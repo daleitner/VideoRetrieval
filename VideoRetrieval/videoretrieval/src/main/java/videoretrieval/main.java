@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.opencv.core.*;
@@ -173,7 +174,12 @@ public class main {
     }
 
     private static void executeQuery(String[] labels, Colour[] dominantColours, boolean strict) {
-        FrameDescriptor[] matches = dbClient.query(labels, strict);
+        RankedFrameDescriptor[] matches = rankResults(
+                dbClient.query(labels, strict),
+                labels,
+                new double[0],
+                dominantColours
+        );
 
         System.out.println(matches.length);
         System.out.println("not implemented");
@@ -181,10 +187,30 @@ public class main {
 
     private static void executeQuery(Mat image, boolean strict) {
         FrameDescriptor queryFrame = getFrameDescriptor(new Frame(0, 0, image, VideoAnalyzer.calcHist(image)));
-        FrameDescriptor[] matches = dbClient.query(queryFrame.labels, strict);
+        RankedFrameDescriptor[] matches = rankResults(
+                dbClient.query(queryFrame.labels, strict),
+                queryFrame.labels,
+                queryFrame.histogram,
+                queryFrame.dominantColours
+        );
 
         System.out.println(matches.length);
         System.out.println("not implemented");
+    }
+
+    private static RankedFrameDescriptor[] rankResults(FrameDescriptor[] results, String[] targetLabels, double[] histogram, Colour[] dominantColours) {
+        ArrayList<RankedFrameDescriptor> rankedFrameDescriptorsList = new ArrayList<>(results.length);
+
+        for (FrameDescriptor descriptor: results) {
+            RankedFrameDescriptor rankedFrameDescriptor = new RankedFrameDescriptor(descriptor);
+            rankedFrameDescriptor.calculateScore(targetLabels, histogram, dominantColours);
+            rankedFrameDescriptorsList.add(rankedFrameDescriptor);
+        }
+
+        RankedFrameDescriptor[] rankedFrameDescriptors = rankedFrameDescriptorsList.toArray(new RankedFrameDescriptor[0]);
+        Arrays.sort(rankedFrameDescriptors, (a, b) -> (int) Math.signum(b.score - a.score));
+
+        return rankedFrameDescriptors;
     }
 
     private static Colour[] getDominantColours(Mat image, int k) {
