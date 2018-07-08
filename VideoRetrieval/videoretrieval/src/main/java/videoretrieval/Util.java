@@ -1,5 +1,6 @@
 package videoretrieval;
 
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
@@ -32,5 +33,11 @@ public class Util {
         hist.convertTo(hist, CvType.CV_32FC1);
 
         return hist;
+    }
+
+    private static double[] renormHist(double[] unnormHistArr) {
+        Mat hist = Util.arr2Mat(unnormHistArr);
+        Core.normalize(hist, hist, 0, 1 , Core.NORM_MINMAX);
+        return Util.mat2Arr(hist);
     }
 }
