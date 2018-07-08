@@ -1,13 +1,10 @@
 package videoretrieval;
 
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.opencv.core.Core.NORM_L2;
-import static org.opencv.core.Core.max;
 import static org.opencv.core.Core.norm;
 import static org.opencv.core.CvType.CV_32FC1;
 
