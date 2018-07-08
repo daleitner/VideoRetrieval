@@ -54,7 +54,14 @@ public class VideoAnalyzer {
         Mat previousFrameHist = new Mat();
         Mat nextFrameHist = new Mat();
 
-        int samplingDistance = (int) Math.round(video.get(Videoio.CAP_PROP_FPS)) / fps;
+        int samplingDistance = 1;
+
+        if (fps > 0) {
+            samplingDistance = (int) Math.round(video.get(Videoio.CAP_PROP_FPS)) / fps;
+        }
+
+        System.out.println("Using frame sampling interval: " + samplingDistance);
+
         boolean isFirstFrame = true;
         int frameCount = 0;
 
@@ -62,7 +69,7 @@ public class VideoAnalyzer {
             if (frame.empty()) { continue; }
             frameCount++;
 
-            if (frameCount % samplingDistance == 1) {
+            if ((frameCount % samplingDistance == 1) || samplingDistance == 1) {
                 if (isFirstFrame) {
                     isFirstFrame = false;
                     frames.add(frame.clone());
