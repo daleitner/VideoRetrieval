@@ -4,6 +4,8 @@ import com.mongodb.MongoClient;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
