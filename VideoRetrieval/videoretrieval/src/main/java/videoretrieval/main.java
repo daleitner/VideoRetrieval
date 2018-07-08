@@ -304,6 +304,12 @@ public class main {
         return FrameDescriptor.create(f.fileId, f.number, mat2Arr(f.histogram), getDominantColours(f.data, 5), labels);
     }
 
+    private static double[] renormHist(double[] unnormHistArr) {
+        Mat hist = arr2Mat(unnormHistArr);
+        Core.normalize(hist, hist, 0, 1 , Core.NORM_MINMAX);
+        return mat2Arr(hist);
+    }
+
     private static double[] mat2Arr(Mat hist) {
         // Convert histogram Mat into double array
         // Some "workaround" taken from
