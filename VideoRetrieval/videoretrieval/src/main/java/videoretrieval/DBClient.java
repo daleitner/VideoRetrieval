@@ -8,6 +8,7 @@ import org.jongo.MongoCursor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +43,7 @@ public class DBClient {
         this.frameDescriptors.save(descriptor);
     }
 
-    public ArrayList<FrameDescriptor> getAllDescriptors() {
+    public FrameDescriptor[] getAllDescriptors() {
         MongoCursor<FrameDescriptor> descriptors = this.frameDescriptors.find().as(FrameDescriptor.class);
         ArrayList<FrameDescriptor> descriptorList = new ArrayList<>(descriptors.count());
 
@@ -50,6 +51,24 @@ public class DBClient {
             descriptorList.add(descriptors.next());
         }
 
-        return descriptorList;
+        return descriptorList.toArray(new FrameDescriptor[0]);
+    }
+
+    public FrameDescriptor[] query(String[] labels, Boolean matchAll) {
+        String query = "{ labels : { " + (matchAll ? "$all" : "$in") + " : [ ";
+
+        for (int i = 0; i < labels.length; i++) {
+            query += "'" + labels[i] + "'" + (i == labels.length - 1 ? " " : ", ");
+        }
+
+        query += " ] } }";
+        MongoCursor<FrameDescriptor> matches = this.frameDescriptors.find(query).as(FrameDescriptor.class);
+        ArrayList<FrameDescriptor> matchesList = new ArrayList<>(matches.count());
+
+        while(matches.hasNext()) {
+            matchesList.add(matches.next());
+        }
+
+        return matchesList.toArray(new FrameDescriptor[0]);
     }
 }

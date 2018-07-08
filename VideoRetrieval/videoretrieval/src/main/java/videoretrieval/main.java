@@ -144,10 +144,16 @@ public class main {
     }
 
     private static void executeQuery(String[] labels, Colour[] dominantColours) {
+        FrameDescriptor[] matches = dbClient.query(labels, false);
+
         System.out.println("not implemented");
     }
 
     private static void executeQuery(Mat image) {
+        // TODO: get labels
+        String[] labels = new String[0];
+        FrameDescriptor[] matches = dbClient.query(labels, false);
+
         System.out.println("not implemented");
     }
 
