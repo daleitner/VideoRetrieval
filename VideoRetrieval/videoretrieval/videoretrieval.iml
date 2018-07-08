@@ -19,21 +19,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="jdk" jdkName="9.0" jdkType="JavaSDK" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://E:/OpenCV/opencv/build/java/opencv-342.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <NATIVE>
-          <root url="file://E:/OpenCV/opencv/build/java/x64" />
-        </NATIVE>
-        <SOURCES>
-          <root url="jar://E:/OpenCV/opencv/build/java/opencv-342.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -59,6 +45,20 @@
           <root url="jar://$MODULE_DIR$/lib/jackson-databind-2.9.5-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/jongo-1.4.0-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/mongo-java-driver-3.8.0-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/opencv-342.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <NATIVE>
+          <root url="file://$MODULE_DIR$/lib" />
+        </NATIVE>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/opencv-342.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

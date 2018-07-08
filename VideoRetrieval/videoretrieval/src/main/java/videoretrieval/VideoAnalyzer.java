@@ -42,14 +42,14 @@ public class VideoAnalyzer {
      * @param th        Threshold for Histogram comparison between inspected frames (correlation metric). [-1;1]
      * @return Extracted Frames.
      */
-    public ArrayList<Mat> extractKeyFrames(String videoPath, int fps, double th) {
+    public ArrayList<Frame> extractKeyFrames(String videoPath, int videoId, int fps, double th) {
         VideoCapture video = new VideoCapture(videoPath);
 
         System.out.println("FPS: " + video.get(Videoio.CAP_PROP_FPS));
         System.out.println("Frames: " + video.get(Videoio.CAP_PROP_FRAME_COUNT));
 
         Mat frame = new Mat();
-        ArrayList<Mat> frames = new ArrayList<Mat>();
+        ArrayList<Frame> frames = new ArrayList<>();
         Mat previousFrameHist = new Mat();
         Mat nextFrameHist = new Mat();
 
@@ -71,8 +71,8 @@ public class VideoAnalyzer {
             if ((frameCount % samplingDistance == 1) || samplingDistance == 1) {
                 if (isFirstFrame) {
                     isFirstFrame = false;
-                    frames.add(frame.clone());
                     previousFrameHist = this.calcHist(frame);
+                    frames.add(new Frame(videoId, frameCount - 1, frame.clone(), previousFrameHist));
                 } else {
                     nextFrameHist = this.calcHist(frame);
                     // Imgproc.compareHist with Imgproc.CV_COMP_CORREL returns similarity measure
@@ -80,7 +80,9 @@ public class VideoAnalyzer {
 
                     if(distance > th) {
                         System.out.println("distance (" + frames.size() + "," + (frames.size() + 1) + "): " + distance);
-                        frames.add(frame.clone());
+
+                        FrameDescriptor descriptor = FrameDescriptor.create(videoId, frameCount - 1, null, null, null);
+                        frames.add(new Frame(videoId, frameCount - 1, frame.clone(), nextFrameHist));
 
                         // TODO this must be moved outside the if?
                         previousFrameHist = nextFrameHist;

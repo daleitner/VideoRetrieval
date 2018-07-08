@@ -2,10 +2,12 @@ package videoretrieval;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -22,8 +24,7 @@ public class main {
 
     private static DBClient dbClient;
     private static ImageClassifier classifier;
-    private static final String path = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos";
-    private static final String testvideo = path + "/35368.mp4";
+    private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos";
 
     public static void main(String[] args) throws Exception {
         dbClient = new DBClient();
@@ -157,15 +158,45 @@ public class main {
         System.out.println("not implemented");
     }
 
-    private static void runClassification() {
-        VideoAnalyzer va = new VideoAnalyzer();
-        ArrayList<Mat> frames = va.extractKeyFrames(testvideo, 1, 0.6);
+	private static void runClassification() {
+		List<String> videoFileNames = readFileNames(basePath);
 
-        String imgPath = path + "/Imgs/";
-        for(int i = 0; i<frames.size(); i++) {
-            Mat frame = frames.get(i);
-            System.out.println("Labels: " + Arrays.toString(classifier.getLabels(classifier.classify(frame, 5))));
-            Imgcodecs.imwrite(imgPath + (i+1) + ".jpg", frame);
-        }
-    }
+		// TODO run over all videos
+		String videoFileName = videoFileNames.get(23);
+		int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
+
+		VideoAnalyzer va = new VideoAnalyzer();
+		ArrayList<Frame> frames = va.extractKeyFrames(basePath + videoFileName, fileId, 1, 0.6);
+
+		for (Frame f: frames) {
+			String[] labels = classifier.getLabels(classifier.classify(f.data, 5));
+			System.out.println("Labels: " + Arrays.toString(labels));
+			// TODO convert f.histogram to array
+			// TODO get dominant colors
+			// TODO save to DB
+			FrameDescriptor.create(f.fileId, f.number, null /*f.histogram*/, null, labels);
+		}
+
+		// Save frames
+		String imgPath = basePath + "img" + videoFileName.replaceAll(".mp4","") + "/" ;
+		for(int i = 0; i < frames.size(); i++) {
+			Mat frame = frames.get(i).data;
+			Imgcodecs.imwrite(imgPath + (i+1) + ".jpg", frame);
+		}
+	}
+
+	private static List<String> readFileNames(String directoryPath) {
+		File folder = new File(directoryPath);
+		File[] listOfFiles = folder.listFiles();
+
+		List<String> videoFileNames = new ArrayList<String>();
+
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile()) {
+				videoFileNames.add(listOfFiles[i].getName());
+			}
+		}
+
+		return videoFileNames;
+	}
 }
