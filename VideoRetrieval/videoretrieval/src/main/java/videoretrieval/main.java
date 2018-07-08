@@ -227,7 +227,7 @@ public class main {
 		List<String> videoFileNames = new ArrayList<String>();
 
 		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile()) {
+			if (listOfFiles[i].getName().endsWith(".mp4")) {
 				videoFileNames.add(listOfFiles[i].getName());
 			}
 		}
