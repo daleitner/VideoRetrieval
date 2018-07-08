@@ -18,18 +18,19 @@ public class VideoAnalyzer {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
+    private int hbins = 30, sbins = 32;
+    private MatOfInt histSize = new MatOfInt(this.hbins, this.sbins);
+
     public VideoAnalyzer() {
     }
 
     private Mat calcHist(Mat frame) {
         Mat hsvHist = new Mat();
-        int hbins = 30, sbins = 32;
-        MatOfInt histSize = new MatOfInt(hbins, sbins);
         MatOfFloat histRange = new MatOfFloat(0f, 180f, 0f, 256f);
 
         Mat hsvframe = new Mat();
         Imgproc.cvtColor(frame, hsvframe, Imgproc.COLOR_BGR2HSV);
-        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, histSize, histRange);
+        Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, this.histSize, histRange);
 
         return hsvHist;
     }
