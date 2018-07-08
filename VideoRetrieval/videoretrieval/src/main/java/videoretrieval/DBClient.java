@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,9 +66,23 @@ public class DBClient {
             }
             query += " ] } }";
         } else {
+            Set<String> partialLabelsSet = new HashSet<>();
+
+            for (String label: labels) {
+                if (label.contains(" ")) {
+                    for (String partialLabel: label.split(" ")) {
+                        partialLabelsSet.add(partialLabel.trim());
+                    }
+                } else {
+                    partialLabelsSet.add(label.trim());
+                }
+            }
+
+            String[] partialLabels = partialLabelsSet.toArray(new String[0]);
+
             query = "{ $or: [ ";
-            for (int i = 0; i < labels.length; i++) {
-                query += "{ labels: { $regex: /.*" + labels[i] + ".*/i } " + (i == labels.length - 1 ? " } " : " }, ");
+            for (int i = 0; i < partialLabels.length; i++) {
+                query += "{ labels: { $regex: /.*" + partialLabels[i] + ".*/i } " + (i == partialLabels.length - 1 ? " } " : " }, ");
             }
             query += " ] }";
         }
