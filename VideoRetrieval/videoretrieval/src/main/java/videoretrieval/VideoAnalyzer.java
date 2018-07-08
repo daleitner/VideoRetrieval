@@ -30,6 +30,7 @@ public class VideoAnalyzer {
         Mat hsvframe = new Mat();
         Imgproc.cvtColor(frame, hsvframe, Imgproc.COLOR_BGR2HSV);
         Imgproc.calcHist(Arrays.asList(hsvframe), new MatOfInt(0, 1), new Mat(), hsvHist, VideoAnalyzer.histSize, histRange);
+        Core.normalize(hsvHist, hsvHist, 0, 1 , Core.NORM_MINMAX);
 
         return hsvHist;
     }
