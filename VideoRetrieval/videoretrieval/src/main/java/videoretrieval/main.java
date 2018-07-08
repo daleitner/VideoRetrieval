@@ -229,18 +229,28 @@ public class main {
 
     private static void submitResults(RankedFrameDescriptor[] results, int numResults) {
         int i = 0;
-        String success = "wv";
+        String success = "wrong_video";
         numResults = Math.min(numResults, results.length);
+        ArrayList<Integer> wrongVideosId = new ArrayList<>();
 
         System.out.println("Submitting results... ");
         while(!success.equals("sc") && i < numResults) {
-            try {
-                success = submitResult(String.valueOf(results[i].fileId), String.valueOf(results[i].frameNumber));
+            int currentId = results[i].fileId;
+            if (wrongVideosId.contains(currentId)) { continue; }
 
-                if (success.equals("wv")) {
-                    // TODO: remove this video id
-                } else if (success.equals("wf")) {
-                    // TODO: remove all other video ids
+            try {
+                success = submitResult(String.valueOf(currentId), String.valueOf(results[i].frameNumber));
+
+                if (success.equals("wrong_video")) {
+                    // wrong video remove all related results
+                    wrongVideosId.add(currentId);
+                } else if (success.equals("wrong_frame")) {
+                    // we're at the right video, remove all other videos from results
+                    for (RankedFrameDescriptor r: results) {
+                        if (r.fileId != currentId) {
+                            wrongVideosId.add(r.fileId);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("Exception on submitResult: " + e.getMessage());
@@ -354,9 +364,9 @@ public class main {
         System.out.println("\tResponse: " + responseString);
 
         if (responseString.contains("Wrong video")) {
-            return "wv";
+            return "wrong_video";
         } else if (responseString.contains("Wrong")) {
-            return "wf";
+            return "wrong_frame";
         } else {
             return "sc";
         }
