@@ -1,17 +1,32 @@
 package videoretrieval;
 
-import de.undercouch.bson4jackson.types.ObjectId;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bson.types.ObjectId;
 
 public class FrameDescriptor {
 
+    public FrameDescriptor() { }
+
     private ObjectId _id;
 
-    private String fileName;
+    @JsonProperty("fileName")
+    public String fileName;
 
-    private int frameNumber;
+    @JsonProperty("frameNumber")
+    public int frameNumber;
 
-    private double[] histogram;
+    @JsonProperty("histogram")
+    public double[] histogram;
 
-    private Colour[] dominantColours;
+    @JsonProperty("dominantColours")
+    public Colour[] dominantColours;
 
+    public static FrameDescriptor create(String fileName, int frameNumber, double[] histogram, Colour[] dominantColours) {
+        FrameDescriptor descriptor = new FrameDescriptor();
+        descriptor.fileName = fileName;
+        descriptor.frameNumber = frameNumber;
+        descriptor.histogram = histogram;
+        descriptor.dominantColours = dominantColours;
+        return descriptor;
+    }
 }
