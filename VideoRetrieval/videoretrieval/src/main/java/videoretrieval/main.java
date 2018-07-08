@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -161,7 +162,7 @@ public class main {
 	private static void runClassification() {
 		List<String> videoFileNames = readFileNames(basePath);
 
-		// TODO run over all videos
+		// TODO loop over all videos, now using LEGO video only for testing
 		String videoFileName = videoFileNames.get(23);
 		int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
 
@@ -171,10 +172,21 @@ public class main {
 		for (Frame f: frames) {
 			String[] labels = classifier.getLabels(classifier.classify(f.data, 5));
 			System.out.println("Labels: " + Arrays.toString(labels));
-			// TODO convert f.histogram to array
+
+			// Convert histogram Mat into double array
+			// Some "workaround" taken from
+            // http://answers.opencv.org/question/14961/using-get-and-put-to-access-pixel-values-in-java/
+            f.histogram.convertTo(f.histogram, CvType.CV_64FC3);
+            int histArrSize = (int) (f.histogram.total() * f.histogram.channels());
+            double[] hist = new double[histArrSize];
+            f.histogram.get(0,0, hist);
+            for (int i = 0; i < histArrSize; i++) {
+                hist[i] = (hist[i] / 2);
+            }
+
 			// TODO get dominant colors
 			// TODO save to DB
-			FrameDescriptor.create(f.fileId, f.number, null /*f.histogram*/, null, labels);
+			FrameDescriptor.create(f.fileId, f.number, hist, null, labels);
 		}
 
 		// Save frames
