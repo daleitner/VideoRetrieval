@@ -5,7 +5,8 @@ import org.bson.types.ObjectId;
 
 public class FrameDescriptor {
 
-    public FrameDescriptor() { }
+    public FrameDescriptor() {
+    }
 
     private ObjectId _id;
 
@@ -21,12 +22,16 @@ public class FrameDescriptor {
     @JsonProperty("dominantColours")
     public Colour[] dominantColours;
 
-    public static FrameDescriptor create(String fileName, int frameNumber, double[] histogram, Colour[] dominantColours) {
+    @JsonProperty("labels")
+    public String[] labels;
+
+    public static FrameDescriptor create(String fileName, int frameNumber, double[] histogram, Colour[] dominantColours, String[] labels) {
         FrameDescriptor descriptor = new FrameDescriptor();
         descriptor.fileName = fileName;
         descriptor.frameNumber = frameNumber;
         descriptor.histogram = histogram;
         descriptor.dominantColours = dominantColours;
+        descriptor.labels = labels;
         return descriptor;
     }
 }

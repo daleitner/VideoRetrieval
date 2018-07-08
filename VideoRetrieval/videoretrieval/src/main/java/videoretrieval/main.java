@@ -15,8 +15,7 @@ public class main {
 
 	public static void main(String[] args) throws Exception {
 		dbClient = new DBClient();
-
-		System.out.println(dbClient.getAllDescriptors().size());
+		dbClient.clear();
 
 		System.out.println(testvideo);
 

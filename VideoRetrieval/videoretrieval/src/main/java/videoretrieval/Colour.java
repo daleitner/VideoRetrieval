@@ -5,7 +5,8 @@ import org.bson.types.ObjectId;
 
 public class Colour {
 
-    public Colour() { }
+    public Colour() {
+    }
 
     private ObjectId _id;
 
