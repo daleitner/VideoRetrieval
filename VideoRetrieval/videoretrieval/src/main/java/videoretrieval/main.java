@@ -52,6 +52,7 @@ public class main {
         System.out.println("  [7] Execute query based on query image URL");
         System.out.println("  [8] Execute query based on query image URL (strict)");
         System.out.println("  [C] Clear the image descriptor database");
+        System.out.println("  [N] Normalize histograms in descriptor database");
         System.out.println("  [q] quit");
         readMenuInput();
     }
@@ -104,6 +105,10 @@ public class main {
 
             case 'C':
                 dbClient.clear();
+                break;
+
+            case 'N':
+                dbClient.normalizeHistograms();
                 break;
 
             case 'q':

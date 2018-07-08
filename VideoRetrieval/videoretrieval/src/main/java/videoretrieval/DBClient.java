@@ -98,4 +98,14 @@ public class DBClient {
 
         return matchesList.toArray(new FrameDescriptor[0]);
     }
+
+    public void normalizeHistograms() {
+        FrameDescriptor[] descriptors = this.getAllDescriptors();
+
+        for (FrameDescriptor descriptor: descriptors) {
+            // TODO: call normalization function
+            descriptor.histogram = descriptor.histogram;
+            this.frameDescriptors.update(descriptor._id).with(descriptor);
+        }
+    }
 }

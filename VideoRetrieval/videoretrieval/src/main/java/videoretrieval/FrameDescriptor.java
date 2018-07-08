@@ -8,7 +8,7 @@ public class FrameDescriptor {
     public FrameDescriptor() {
     }
 
-    private ObjectId _id;
+    public ObjectId _id;
 
     @JsonProperty("fileId")
     public int fileId;
