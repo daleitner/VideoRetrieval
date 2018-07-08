@@ -4,6 +4,8 @@ import com.mongodb.MongoClient;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -103,8 +105,7 @@ public class DBClient {
         FrameDescriptor[] descriptors = this.getAllDescriptors();
 
         for (FrameDescriptor descriptor: descriptors) {
-            // TODO: call normalization function
-            descriptor.histogram = descriptor.histogram;
+            descriptor.histogram = Util.normalizeHistogram(descriptor.histogram);
             this.frameDescriptors.update(descriptor._id).with(descriptor);
         }
     }
