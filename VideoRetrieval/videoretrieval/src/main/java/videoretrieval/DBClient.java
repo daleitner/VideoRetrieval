@@ -8,12 +8,16 @@ import org.jongo.MongoCursor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBClient {
 
     private MongoCollection frameDescriptors;
 
     public DBClient() {
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.SEVERE);
         MongoClient mongoClient = new MongoClient();
         Jongo jongoClient = new Jongo(mongoClient.getDB("VideoRetrieval"));
         this.frameDescriptors = jongoClient.getCollection("FrameDescriptors");
