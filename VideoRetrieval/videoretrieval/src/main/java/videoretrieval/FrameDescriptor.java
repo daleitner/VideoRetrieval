@@ -10,8 +10,8 @@ public class FrameDescriptor {
 
     private ObjectId _id;
 
-    @JsonProperty("fileName")
-    public String fileName;
+    @JsonProperty("fileId")
+    public int fileId;
 
     @JsonProperty("frameNumber")
     public int frameNumber;
@@ -25,9 +25,9 @@ public class FrameDescriptor {
     @JsonProperty("labels")
     public String[] labels;
 
-    public static FrameDescriptor create(String fileName, int frameNumber, double[] histogram, Colour[] dominantColours, String[] labels) {
+    public static FrameDescriptor create(int fileId, int frameNumber, double[] histogram, Colour[] dominantColours, String[] labels) {
         FrameDescriptor descriptor = new FrameDescriptor();
-        descriptor.fileName = fileName;
+        descriptor.fileId = fileId;
         descriptor.frameNumber = frameNumber;
         descriptor.histogram = histogram;
         descriptor.dominantColours = dominantColours;
