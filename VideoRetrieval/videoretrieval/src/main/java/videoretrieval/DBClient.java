@@ -60,13 +60,13 @@ public class DBClient {
         if (strict) {
             query = "{ labels : { $all: [ ";
             for (int i = 0; i < labels.length; i++) {
-                query += "'" + labels[i] + "'" + (i == labels.length - 1 ? " " : ", ");
+                query += "\"" + labels[i] + "\"" + (i == labels.length - 1 ? " " : ", ");
             }
             query += " ] } }";
         } else {
             query = "{ $or: [ ";
             for (int i = 0; i < labels.length; i++) {
-                query += "{ labels: '" + labels[i] + "'" + (i == labels.length - 1 ? " } " : " }, ");
+                query += "{ labels: \"" + labels[i] + "\"" + (i == labels.length - 1 ? " } " : " }, ");
             }
             query += " ] }";
         }
