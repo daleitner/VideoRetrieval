@@ -25,7 +25,12 @@ public class main {
 
     private static DBClient dbClient;
     private static ImageClassifier classifier;
+
+    // Wolfram's setup
     private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos";
+
+    // Jameson's setup
+    // private static final String basePath = "C:/Users/Admin/vids/";
 
     public static void main(String[] args) throws Exception {
         dbClient = new DBClient();
