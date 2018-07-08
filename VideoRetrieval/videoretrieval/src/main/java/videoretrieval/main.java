@@ -236,20 +236,27 @@ public class main {
     }
 
 	private static void runClassification() {
+        System.out.println("Running classification on all videos...");
 		List<String> videoFileNames = readFileNames(basePath);
 
-		// TODO loop over all videos, now using LEGO video only for testing
-		String videoFileName = videoFileNames.get(23);
-		videoFileName = "35368.mp4";
-		int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
+		for (String videoFileName: videoFileNames) {
+		    classify(videoFileName);
+        }
+	}
 
-		VideoAnalyzer va = new VideoAnalyzer();
+	private static void classify(String videoFileName) {
+        System.out.println("########################################");
+        System.out.println("Classifying " + videoFileName);
+        int fileId = Integer.parseInt(videoFileName.replaceAll(".mp4",""));
+
+        VideoAnalyzer va = new VideoAnalyzer();
         ArrayList<Frame> frames = va.extractKeyFrames(basePath + videoFileName, fileId, 1, 0.6);
 
-		for (Frame f: frames) {
+        System.out.println("Writing descriptor to DB for " + videoFileName);
+        for (Frame f: frames) {
             dbClient.saveFrameDescriptor(getFrameDescriptor(f));
-		}
-	}
+        }
+    }
 
 	private static FrameDescriptor getFrameDescriptor(Frame f) {
         String[] rawLabels = classifier.getLabels(classifier.classify(f.data, 5));
