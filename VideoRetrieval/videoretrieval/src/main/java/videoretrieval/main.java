@@ -236,24 +236,24 @@ public class main {
         System.out.println("Submitting results... ");
         while(!success.equals("sc") && i < numResults) {
             int currentId = results[i].fileId;
-            if (wrongVideosId.contains(currentId)) { continue; }
+            if (!wrongVideosId.contains(currentId)) {
+                try {
+                    success = submitResult(String.valueOf(currentId), String.valueOf(results[i].frameNumber));
 
-            try {
-                success = submitResult(String.valueOf(currentId), String.valueOf(results[i].frameNumber));
-
-                if (success.equals("wrong_video")) {
-                    // wrong video remove all related results
-                    wrongVideosId.add(currentId);
-                } else if (success.equals("wrong_frame")) {
-                    // we're at the right video, remove all other videos from results
-                    for (RankedFrameDescriptor r: results) {
-                        if (r.fileId != currentId) {
-                            wrongVideosId.add(r.fileId);
+                    if (success.equals("wrong_video")) {
+                        // wrong video remove all related results
+                        wrongVideosId.add(currentId);
+                    } else if (success.equals("wrong_frame")) {
+                        // we're at the right video, remove all other videos from results
+                        for (RankedFrameDescriptor r: results) {
+                            if (r.fileId != currentId) {
+                                wrongVideosId.add(r.fileId);
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    System.out.println("Exception on submitResult: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                System.out.println("Exception on submitResult: " + e.getMessage());
             }
             i++;
         }
