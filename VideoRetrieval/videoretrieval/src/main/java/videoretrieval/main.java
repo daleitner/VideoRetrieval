@@ -15,8 +15,11 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
 
 import javax.imageio.ImageIO;
+
+import static org.opencv.videoio.Videoio.CV_CAP_PROP_POS_FRAMES;
 
 public class main {
 
@@ -26,7 +29,8 @@ public class main {
 
     private static DBClient dbClient;
     private static ImageClassifier classifier;
-    private static boolean shouldSubmitResults = true;
+    private static boolean shouldSubmitResults = false;
+    private static int maxSavedFrames = 100;
 
     // Wolfram's setup
     //private static final String basePath = "F:/Privat/DLVideoRetrieval/VideoRetrieval/videoretrieval/videos/";
@@ -177,6 +181,17 @@ public class main {
         return colours.toArray(new Colour[0]);
     }
 
+    private static void saveFrame(RankedFrameDescriptor frameDescriptor, int rank) {
+        String videoFullPath = basePath + frameDescriptor.fileId + ".mp4";
+        VideoCapture video = new VideoCapture(videoFullPath);
+        Mat frame = new Mat();
+
+        String framePath = basePath + "frames/" + rank + "_" + frameDescriptor.fileId + "_" + frameDescriptor.frameNumber + ".jpg";
+        video.set(CV_CAP_PROP_POS_FRAMES, frameDescriptor.frameNumber);
+        video.read(frame);
+        Imgcodecs.imwrite(framePath, frame);
+    }
+
     private static void executeQuery(String[] labels, Colour[] dominantColours, boolean strict) {
         RankedFrameDescriptor[] matches = rankResults(
                 dbClient.query(labels, strict),
@@ -186,6 +201,10 @@ public class main {
         );
 
         System.out.println(matches.length);
+
+        for(int i = 0; i < Math.min(matches.length, maxSavedFrames); i++) {
+            saveFrame(matches[i], i);
+        }
 
         if (shouldSubmitResults) {
             submitResults(matches);
@@ -202,6 +221,10 @@ public class main {
         );
 
         System.out.println(matches.length);
+
+        for(int i = 0; i < Math.min(matches.length, maxSavedFrames); i++) {
+            saveFrame(matches[i], i);
+        }
 
         if (shouldSubmitResults) {
             submitResults(matches);
